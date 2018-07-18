@@ -30,19 +30,23 @@ and VarDecl =
                                     )
 
 and Expression =
-    | BinaryExpression of (Expression * TypeSpec) * BinaryOperator * (Expression * TypeSpec)
+    | BinaryExpression of Expression * BinaryOperator * Expression
     | LiteralExpression of Literal
     member x.Emit(): ExpressionSyntax * TypeSpec =
         match x with
-        | BinaryExpression((le,lt),op,(re,rt)) -> SyntaxFactory.BinaryExpression(
+        | BinaryExpression(le,op,re) -> SyntaxFactory.BinaryExpression(
                                                     op.Emit(),
                                                     (le.Emit() |> fun (e,t) -> e),
                                                     (re.Emit() |> fun (e,t) -> e)
-                                                    ) :> ExpressionSyntax, lt.ImplicitCast(rt)
+                                                    ) :> ExpressionSyntax, match le.ToTypeSpec().ImplicitCast(re.ToTypeSpec()) with
+                                                                           | Ok t -> t
+                                                                           | Error m -> invalidOp m
         | LiteralExpression(l) -> l.Emit() :> ExpressionSyntax, l.ToTypeSpec()
     member x.ToTypeSpec(): TypeSpec =
         match x with
-        | BinaryExpression((le,lt),op,(re,rt)) -> lt.ImplicitCast(rt)
+        | BinaryExpression(le,op,re) -> match le.ToTypeSpec().ImplicitCast(re.ToTypeSpec()) with
+                                        | Ok t -> t
+                                        | Error m -> invalidOp m
         | LiteralExpression(l) -> l.ToTypeSpec()
 
 and BinaryOperator =
@@ -107,29 +111,29 @@ and TypeSpec =
         | TInt    -> SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.LongKeyword))
         | TBool   -> SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.BoolKeyword))
         | TString -> SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.StringKeyword))
-    member x.ImplicitCast(y) = 
+    member x.ImplicitCast(y): Result<TypeSpec,_> = 
         let err left right = Error(sprintf "Invalid implicit cast: %A and %A" left right)
         match x with
         | TDouble -> match y with
-                     | TDouble -> Ok(TDouble)
-                     | TInt    -> Ok(TDouble)
+                     | TDouble -> Ok TDouble 
+                     | TInt    -> Ok TDouble
                      | TBool   -> err x y
                      | TString -> err x y
         | TInt   -> match y with
-                     | TDouble -> Ok(TDouble)
-                     | TInt    -> Ok(TDouble)
+                     | TDouble -> Ok TDouble
+                     | TInt    -> Ok TDouble
                      | TBool   -> err x y
                      | TString -> err x y
         | TBool   -> match y with
                      | TDouble -> err x y
                      | TInt    -> err x y
-                     | TBool   -> Ok(TBool)
+                     | TBool   -> Ok TBool
                      | TString -> err x y
-        | TString   -> match y with
+        | TString -> match y with
                      | TDouble -> err x y
                      | TInt    -> err x y
                      | TBool   -> err x y
-                     | TString -> Ok(TString)
+                     | TString -> Ok TString
 
 and Literal =
     | LDouble of double

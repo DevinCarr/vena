@@ -73,10 +73,11 @@ let main argv =
 //let de = 0.1;" r
 //    show pProgram "let a = 0.1*8" [(ScalarVarDeclInit("a", BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L)))) ]
 //    let testexpr = [| SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier("Ident"), null, SyntaxFactory.EqualsValueClause((LInt 64L).Emit())) |] |> Array.toSeq
-    let testtest = SyntaxFactory.LocalDeclarationStatement(SyntaxFactory.VariableDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.LongKeyword)), SyntaxFactory.SeparatedList<Syntax.VariableDeclaratorSyntax>(testexpr)))
-    printfn "%A" (testtest.ToFullString())
-    codegentest (emit (BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L))))
-    let compile = codegen (emit (BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L)))) "vena_codegen"
+//    let testtest = SyntaxFactory.LocalDeclarationStatement(SyntaxFactory.VariableDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.LongKeyword)), SyntaxFactory.SeparatedList<Syntax.VariableDeclaratorSyntax>(testexpr)))
+//    printfn "%A" (testtest.ToFullString())
+    let (testexpr, testtype) = emit (BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L)))
+    codegentest testexpr
+    let compile = codegen testexpr "vena_codegen"
     let errors = 
         match (compile.Success) with
         | true -> printf "Compiled"

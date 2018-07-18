@@ -41,17 +41,18 @@ let vena expr = SyntaxFactory.CompilationUnit().AddMembers(
 
 //let runtimeFormat (s:string) = MetadataReference.CreateFromFile(String.Format(@"C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1\{0}.dll", s))
 let metaref file = MetadataReference.CreateFromFile(file) :> MetadataReference
-let referencesCore = Directory.GetFiles(@"C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1", "*.dll") |> Array.map metaref |> Array.toSeq
-let runtimeFormat (s:string) = MetadataReference.CreateFromFile(String.Format(@"C:\Windows\Microsoft.NET\Framework\v4.0.30319\{0}.dll", s))
-let references = new List<MetadataReference>()
-let refs = [
-    runtimeFormat "mscorlib"
-]
+//let referencesCore = Directory.GetFiles(@"C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.0\ref\netcoreapp2.1", "*.dll") |> Array.map metaref |> Array.toSeq
+let referencesCoreMac = Directory.GetFiles(@"/usr/local/share/dotnet/sdk/NuGetFallbackFolder/microsoft.netcore.app/2.1.1/ref/netcoreapp2.1", "*.dll") |> Array.map metaref |> Array.toSeq
+//let runtimeFormat (s:string) = MetadataReference.CreateFromFile(String.Format(@"C:\Windows\Microsoft.NET\Framework\v4.0.30319\{0}.dll", s))
+//let references = new List<MetadataReference>()
+//let refs = [
+//    runtimeFormat "mscorlib"
+//]
 
-refs |> List.map references.Add |> ignore
+//refs |> List.map references.Add |> ignore
     
 let loc = typeof<Object>.Assembly.Location
 let options = new CSharpCompilationOptions(outputKind = OutputKind.ConsoleApplication, optimizationLevel = OptimizationLevel.Release, platform = Platform.AnyCpu)
-let codegen expr file = CSharpCompilation.Create(file, [ (vena expr).SyntaxTree ], referencesCore, options).Emit(file + ".dll")
+let codegen expr file = CSharpCompilation.Create(file, [ (vena expr).SyntaxTree ], referencesCoreMac, options).Emit(file + ".dll")
 
 let codegentest expr = printfn "%A" ((vena expr).ToFullString())
