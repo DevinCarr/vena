@@ -6,6 +6,7 @@ open Vena.CodeGeneration
 open Vena.CodeGenerationTest
 open FParsec
 open Microsoft.CodeAnalysis.CSharp
+open Microsoft.CodeAnalysis
 
 let failTest parse expect = printfn "Failure(Test): \n\texpected %A\n\tactual: %A" expect parse
 
@@ -45,33 +46,35 @@ let main argv =
     test pIdentifier "_a" "_a"
     test pIdentifier "AZ" "AZ"
     test pIdentifier "A:Z" "A"
-    test pExpr "1.0 + 3.0" (BinaryExpression ((LiteralExpression(LDouble 1.0)), Add, (LiteralExpression(LDouble 3.0))))
-    test pExpr "1.0 + 3.0 * 3.0" (BinaryExpression (
-                                    (LiteralExpression(LDouble 1.0)), Add, 
-                                        BinaryExpression (
-                                            (LiteralExpression(LDouble 3.0)), Multiply, LiteralExpression(LDouble 3.0))))
-    test pExpr "1+1.0*4.0*5.0/4.0%2.0" (BinaryExpression
-                                          (LiteralExpression (LInt 1L),Add,
-                                           BinaryExpression
-                                             (BinaryExpression
-                                                (BinaryExpression
-                                                   (BinaryExpression
-                                                      (LiteralExpression (LDouble 1.0),Multiply,
-                                                       LiteralExpression (LDouble 4.0)),Multiply,
-                                                    LiteralExpression (LDouble 5.0)),Divide,
-                                                 LiteralExpression (LDouble 4.0)),Modulus,LiteralExpression (LDouble 2.0))))
-    test pDecl "let a: int \n" (ScalarVarDecl ("a", TInt))
-    test pDecl "let b: double;\t\n" (ScalarVarDecl ("b", TDouble))
-    test pDecl "let c = 1.3\n" (ScalarVarDeclInit ("c", LiteralExpression(LDouble 1.3)))
-    test pDecl "let de = \"asd\";" (ScalarVarDeclInit ("de", LiteralExpression(LString "asd")))
-    test pDecl "let _ = \"asd\";" (ScalarVarDeclInit ("_", LiteralExpression(LString "asd")))
-    test pDecl "let _a_c_ = true;" (ScalarVarDeclInit ("_a_c_", LiteralExpression(LBool true)))
-    let r = [ (ScalarVarDecl ("a", TInt)); (ScalarVarDeclInit ("de", LiteralExpression(LDouble 0.1))) ]
-    testp pProgram "let a: int;let de = 0.1;" r
-    testp pProgram @"let a: int
-let de = 0.1;" r
-    show pProgram "let a = 0.1*8" [(ScalarVarDeclInit("a", BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L)))) ]
-    printfn "%A" (SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(2.0)).ToFullString())
+//    test pExpr "1.0 + 3.0" (BinaryExpression ((LiteralExpression(LDouble 1.0)), Add, (LiteralExpression(LDouble 3.0))))
+//    test pExpr "1.0 + 3.0 * 3.0" (BinaryExpression (
+//                                    (LiteralExpression(LDouble 1.0)), Add, 
+//                                        BinaryExpression (
+//                                            (LiteralExpression(LDouble 3.0)), Multiply, LiteralExpression(LDouble 3.0))))
+//    test pExpr "1+1.0*4.0*5.0/4.0%2.0" (BinaryExpression
+//                                          (LiteralExpression (LInt 1L),Add,
+//                                           BinaryExpression
+//                                             (BinaryExpression
+//                                                (BinaryExpression
+//                                                   (BinaryExpression
+//                                                      (LiteralExpression (LDouble 1.0),Multiply,
+//                                                       LiteralExpression (LDouble 4.0)),Multiply,
+//                                                    LiteralExpression (LDouble 5.0)),Divide,
+//                                                 LiteralExpression (LDouble 4.0)),Modulus,LiteralExpression (LDouble 2.0))))
+//    test pDecl "let a: int \n" (ScalarVarDecl ("a", TInt))
+//    test pDecl "let b: double;\t\n" (ScalarVarDecl ("b", TDouble))
+//    test pDecl "let c = 1.3\n" (ScalarVarDeclInit ("c", LiteralExpression(LDouble 1.3)))
+//    test pDecl "let de = \"asd\";" (ScalarVarDeclInit ("de", LiteralExpression(LString "asd")))
+//    test pDecl "let _ = \"asd\";" (ScalarVarDeclInit ("_", LiteralExpression(LString "asd")))
+//    test pDecl "let _a_c_ = true;" (ScalarVarDeclInit ("_a_c_", LiteralExpression(LBool true)))
+//    let r = [ (ScalarVarDecl ("a", TInt)); (ScalarVarDeclInit ("de", LiteralExpression(LDouble 0.1))) ]
+//    testp pProgram "let a: int;let de = 0.1;" r
+//    testp pProgram @"let a: int
+//let de = 0.1;" r
+//    show pProgram "let a = 0.1*8" [(ScalarVarDeclInit("a", BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L)))) ]
+//    let testexpr = [| SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier("Ident"), null, SyntaxFactory.EqualsValueClause((LInt 64L).Emit())) |] |> Array.toSeq
+    let testtest = SyntaxFactory.LocalDeclarationStatement(SyntaxFactory.VariableDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.LongKeyword)), SyntaxFactory.SeparatedList<Syntax.VariableDeclaratorSyntax>(testexpr)))
+    printfn "%A" (testtest.ToFullString())
     codegentest (emit (BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L))))
     let compile = codegen (emit (BinaryExpression(LiteralExpression(LDouble 0.1), Multiply, LiteralExpression(LInt 8L)))) "vena_codegen"
     let errors = 
