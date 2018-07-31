@@ -4,7 +4,7 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vena", "vena.csproj", "{084AAEC3-41AB-4EBC-87A1-7C5C14EC19E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vena.Test", "Vena.Test\Vena.Test.csproj", "{ED0EAA48-A548-4004-A2E4-F079DCBD9660}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vena.test", "Tests\vena.test.csproj", "{64796C34-FBFC-47D7-91FA-8F4381212168}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +16,10 @@ Global
 		{084AAEC3-41AB-4EBC-87A1-7C5C14EC19E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{084AAEC3-41AB-4EBC-87A1-7C5C14EC19E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{084AAEC3-41AB-4EBC-87A1-7C5C14EC19E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED0EAA48-A548-4004-A2E4-F079DCBD9660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED0EAA48-A548-4004-A2E4-F079DCBD9660}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED0EAA48-A548-4004-A2E4-F079DCBD9660}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED0EAA48-A548-4004-A2E4-F079DCBD9660}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64796C34-FBFC-47D7-91FA-8F4381212168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64796C34-FBFC-47D7-91FA-8F4381212168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64796C34-FBFC-47D7-91FA-8F4381212168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64796C34-FBFC-47D7-91FA-8F4381212168}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
