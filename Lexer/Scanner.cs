@@ -86,6 +86,63 @@ namespace Vena.Lexer
             return true;
         }
 
+        private char Peek()
+        {
+            if (IsAtEnd()) return '\0';
+            return source.ElementAt(current);
+        }
+
+        private char PeekNext()
+        {
+            if (current + 1 >= source.Length) return '\0';
+            return source.ElementAt(current + 1);
+        }
+
+        private void LexString()
+        {
+            while (Peek() != '"' && !IsAtEnd())
+            {
+                if (Peek() == '\n') line++;
+                Advance();
+            }
+
+            // Unterminated string.
+            if (IsAtEnd())
+            {
+                Error.LexicalError(line, "Unterminated string.");
+                return;
+            }
+
+            // The closing ".
+            Advance();
+
+            // Trim the surrounding quotes.
+            String value = source.Substring(start + 1, (current - 1) - (start + 1));
+            AddToken(TokenType.STRING, value);
+        }
+
+        private bool IsDigit(char c)
+        {
+            return c >= '0' && c <= '9';
+        }
+
+        private void Number()
+        {
+            while (IsDigit(Peek())) Advance();
+
+            // Look for a fractional part.
+            if (Peek() == '.' && IsDigit(PeekNext()))
+            {
+                // Consume the "."
+                Advance();
+
+                while (IsDigit(Peek())) Advance();
+            }
+
+            AddToken(TokenType.NUMBER,
+                 double.Parse(source.Substring(start, current - start)));
+        }
+
         private void ScanToken()
         {
             char c = Advance();
@@ -105,8 +162,38 @@ namespace Vena.Lexer
                 case '=': AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL); break;
                 case '<': AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS); break;
                 case '>': AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER); break;
+                // Comments
+                case '/':
+                    if (Match('/'))
+                    {
+                        // A comment goes until the end of the line.
+                        while (Peek() != '\n' && !IsAtEnd()) Advance();
+                    }
+                    else
+                    {
+                        AddToken(TokenType.SLASH);
+                    }
+                    break;
+                // Ignore whitespace.
+                case ' ':
+                case '\r':
+                case '\t':
+                    
+                    break;
+                case '\n':
+                    line++;
+                    break;
+                // Strings
+                case '"': LexString(); break;
                 default:
-                    Error.LexicalError(line, "Unexpected character.");
+                    if (IsDigit(c))
+                    {
+                        Number();
+                    }
+                    else
+                    {
+                        Error.LexicalError(line, "Unexpected character.");
+                    }
                     break;
             }
         }

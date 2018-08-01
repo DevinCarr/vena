@@ -8,20 +8,20 @@ namespace Vena.Lexer
     {
         public TokenType Type { get; private set; }
         readonly string lexeme;
-        readonly object literal;
+        public object Literal { get; private set; }
         readonly int line;
 
         public Token(TokenType type, string lexeme, object literal, int line)
         {
             this.Type = type;
             this.lexeme = lexeme;
-            this.literal = literal;
+            this.Literal = literal;
             this.line = line;
         }
 
         public override string ToString()
         {
-            return Type + " " + lexeme + " " + literal;
+            return Type + " " + lexeme + " " + Literal;
         }
     }
 }
