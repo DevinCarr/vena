@@ -3,12 +3,14 @@ using Xunit;
 using System.Linq;
 using Vena.Lexer;
 
+using static Vena.Lexer.TokenType;
+
 namespace Vena.Test
 {
     public class LexicalTests
     {
         //[Theory]
-        //[InlineData("()", 3, new TokenType[] { TokenType.LEFT_PAREN, TokenType.RIGHT_PAREN, TokenType.EOF })]
+        //[InlineData("()", 3, new TokenType[] { LEFT_PAREN, RIGHT_PAREN, EOF })]
         //public void LexicalTest1(string input, int len, TokenType[] expected)
         //{
         //    var scanner = new Scanner(input);
@@ -27,25 +29,25 @@ namespace Vena.Test
             var input = "== () {\n},.\r-+;\t*!!==<<=>>=";
             var expected = new TokenType[]
             {
-                TokenType.EQUAL_EQUAL,
-                TokenType.LEFT_PAREN,
-                TokenType.RIGHT_PAREN,
-                TokenType.LEFT_BRACE,
-                TokenType.RIGHT_BRACE,
-                TokenType.COMMA,
-                TokenType.DOT,
-                TokenType.MINUS,
-                TokenType.PLUS,
-                TokenType.SEMICOLON,
-                TokenType.STAR,
-                TokenType.BANG,
-                TokenType.BANG_EQUAL,
-                TokenType.EQUAL,
-                TokenType.LESS,
-                TokenType.LESS_EQUAL,
-                TokenType.GREATER,
-                TokenType.GREATER_EQUAL,
-                TokenType.EOF
+                EQUAL_EQUAL,
+                LEFT_PAREN,
+                RIGHT_PAREN,
+                LEFT_BRACE,
+                RIGHT_BRACE,
+                COMMA,
+                DOT,
+                MINUS,
+                PLUS,
+                SEMICOLON,
+                STAR,
+                BANG,
+                BANG_EQUAL,
+                EQUAL,
+                LESS,
+                LESS_EQUAL,
+                GREATER,
+                GREATER_EQUAL,
+                EOF
             };
             var scanner = new Scanner(input);
             var tokens = scanner.ScanTokens();
@@ -77,7 +79,7 @@ namespace Vena.Test
             var scanner = new Scanner(input);
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
-            int lexedCount = tokens.Where(t => t.Type != TokenType.EOF).Count();
+            int lexedCount = tokens.Where(t => t.Type != EOF).Count();
             Assert.Equal(tokenCount, lexedCount);
         }
 
@@ -90,9 +92,9 @@ namespace Vena.Test
             var scanner = new Scanner(input);
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
-            var token = tokens.Where(t => t.Type != TokenType.EOF).First();
+            var token = tokens.Where(t => t.Type != EOF).First();
             string actual = token.Literal as string;
-            Assert.Equal(TokenType.STRING, token.Type);
+            Assert.Equal(STRING, token.Type);
             Assert.Equal(expected, actual);
         }
 
@@ -105,10 +107,25 @@ namespace Vena.Test
             var scanner = new Scanner(input);
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
-            var token = tokens.Where(t => t.Type != TokenType.EOF).First();
+            var token = tokens.Where(t => t.Type != EOF).First();
             double? actual = token.Literal as double?;
-            Assert.Equal(TokenType.NUMBER, token.Type);
+            Assert.Equal(NUMBER, token.Type);
             Assert.Equal(expected, actual.Value);
+        }
+
+        [Theory]
+        [InlineData("asd")]
+        [InlineData("var_iable")]
+        [InlineData("verylongidentifierpleasebeokaywiththis_")]
+        public void IdentifierTest(string input)
+        {
+            var scanner = new Scanner(input);
+            var tokens = scanner.ScanTokens();
+            // Remove the EOF token
+            var token = tokens.Where(t => t.Type != EOF).First();
+            string actual = token.Literal as string;
+            Assert.Equal(IDENTIFIER, token.Type);
+            Assert.Equal(input, actual);
         }
     }
 }

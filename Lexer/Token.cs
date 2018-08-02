@@ -9,14 +9,14 @@ namespace Vena.Lexer
         public TokenType Type { get; private set; }
         readonly string lexeme;
         public object Literal { get; private set; }
-        readonly int line;
+        public int Line { get; private set; }
 
         public Token(TokenType type, string lexeme, object literal, int line)
         {
             this.Type = type;
             this.lexeme = lexeme;
             this.Literal = literal;
-            this.line = line;
+            this.Line = line;
         }
 
         public override string ToString()

@@ -21,8 +21,8 @@ namespace Vena.Lexer
         IDENTIFIER, STRING, NUMBER,
 
         // Keywords.
-        AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
-        PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
+        AND, CLASS, ELSE, FALSE, FUN, FOR, IF, LET, NIL,
+        OR, PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
 
         EOF
     };
@@ -35,6 +35,26 @@ namespace Vena.Lexer
         private int start = 0;
         private int current = 0;
         private int line = 1;
+
+        private static Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
+        {
+            { "and", TokenType.AND },
+            { "class", TokenType.CLASS },
+            { "else", TokenType.ELSE },
+            { "false", TokenType.FALSE },
+            { "for", TokenType.FOR },
+            { "fun", TokenType.FUN },
+            { "if", TokenType.IF },
+            { "let", TokenType.LET },
+            { "nil", TokenType.NIL },
+            { "or", TokenType.OR },
+            { "print", TokenType.PRINT },
+            { "return", TokenType.RETURN },
+            { "super", TokenType.SUPER },
+            { "this", TokenType.THIS },
+            { "true", TokenType.TRUE },
+            { "while", TokenType.WHILE },
+        };
 
         public Scanner(string source)
         {
@@ -126,6 +146,18 @@ namespace Vena.Lexer
             return c >= '0' && c <= '9';
         }
 
+        private bool IsAlpha(char c)
+        {
+            return (c >= 'a' && c <= 'z') ||
+                   (c >= 'A' && c <= 'Z') ||
+                    c == '_';
+        }
+
+        private bool IsAlphaNumeric(char c)
+        {
+            return IsAlpha(c) || IsDigit(c);
+        }
+
         private void Number()
         {
             while (IsDigit(Peek())) Advance();
@@ -141,6 +173,18 @@ namespace Vena.Lexer
 
             AddToken(TokenType.NUMBER,
                  double.Parse(source.Substring(start, current - start)));
+        }
+
+        private void Identifier()
+        {
+            while (IsAlphaNumeric(Peek())) Advance();
+
+            // See if the identifier is a reserved word.
+            string text = source.Substring(start, current - start);
+
+            bool valid = keywords.TryGetValue(text, out TokenType type);
+            if (!valid) type = TokenType.IDENTIFIER;
+            AddToken(type, text);
         }
 
         private void ScanToken()
@@ -189,6 +233,10 @@ namespace Vena.Lexer
                     if (IsDigit(c))
                     {
                         Number();
+                    }
+                    else if (IsAlpha(c))
+                    {
+                        Identifier();
                     }
                     else
                     {
