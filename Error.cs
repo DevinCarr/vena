@@ -6,12 +6,25 @@ using Vena.Lexer;
 
 namespace Vena
 {
-    public static class Error
+    public static class VenaError
     {
         public static bool HasError { get; private set; }
         public static void LexicalError(int line, string message)
         {
             Console.Error.WriteLine($"[line {line}] Lexical Error: {message}");
+            HasError = true;
+        }
+
+        public static void ParseError(Token token, string message)
+        {
+            if (token.Type == TokenType.EOF)
+            {
+                Console.Error.WriteLine($"[line {token.Line} at end] Parse Error: {message}");
+            }
+            else
+            {
+                Console.Error.WriteLine($"[line {token.Line} at '{token.Lexeme}'] Parse Error: {message}");
+            }
             HasError = true;
         }
     }

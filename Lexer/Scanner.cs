@@ -93,7 +93,7 @@ namespace Vena.Lexer
 
         private void AddToken(TokenType type, Object literal)
         {
-            string text = source.Substring(start, 1);
+            string text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
 
@@ -129,7 +129,7 @@ namespace Vena.Lexer
             // Unterminated string.
             if (IsAtEnd())
             {
-                Error.LexicalError(line, "Unterminated string.");
+                VenaError.LexicalError(line, "Unterminated string.");
                 return;
             }
 
@@ -240,7 +240,7 @@ namespace Vena.Lexer
                     }
                     else
                     {
-                        Error.LexicalError(line, "Unexpected character.");
+                        VenaError.LexicalError(line, "Unexpected character.");
                     }
                     break;
             }

@@ -66,7 +66,7 @@ namespace Vena.Test
             var input = "&";
             var scanner = new Scanner(input);
             var tokens = scanner.ScanTokens();
-            Assert.True(Error.HasError);
+            Assert.True(VenaError.HasError);
         }
 
         [Theory]

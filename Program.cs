@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Vena.AST;
 using Vena.Lexer;
 
 namespace Vena
@@ -10,7 +12,7 @@ namespace Vena
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+             if (args.Length != 2)
             {
                 Console.WriteLine("Usage: vena [file]");
             }
@@ -36,6 +38,35 @@ namespace Vena
                         }
                     }
                     Console.Write('\n');
+                }
+                else if (args[0] == "-parse")
+                {
+                    string input = File.ReadAllText(args[1]);
+                    Scanner scanner = new Scanner(input);
+                    var tokens = scanner.ScanTokens();
+                    Parser parser = new Parser(tokens);
+                    List<Stmt> stmts = parser.Parse();
+
+                    // Stop if there was a syntax error.
+                    if (VenaError.HasError) return;
+
+                    Console.WriteLine(new ASTPrinter().Print(stmts));
+                }
+                else if (args[0] == "-gen")
+                {
+                    string input = File.ReadAllText(args[1]);
+
+                    Scanner scanner = new Scanner(input);
+                    var tokens = scanner.ScanTokens();
+                    // Stop if there was a syntax error.
+                    if (VenaError.HasError) return;
+
+                    Parser parser = new Parser(tokens);
+                    List<Stmt> stmts = parser.Parse();
+                    // Stop if there was a parser error.
+                    if (VenaError.HasError) return;
+
+                    Console.WriteLine(new Generator().Emit(stmts));
                 }
             }
         }

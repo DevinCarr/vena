@@ -21,4 +21,7 @@
     <ProjectReference Include="..\vena.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ParserTests\" />
+  </ItemGroup>
 </Project>
