@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Formatting;
 
 namespace Vena.AST
@@ -16,9 +17,9 @@ namespace Vena.AST
         {
         }
 
-        public string Emit(List<Stmt> stmts)
+        public CompilationUnitSyntax Emit(List<Stmt> stmts)
         {
-            var Tvoid = SyntaxFactory.ParseTypeName("void");
+            var Tvoid = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
 
             // Create the body of the main for now.
             var stmtBlock = new List<StatementSyntax>();
@@ -39,8 +40,35 @@ namespace Vena.AST
             )
             ).AddUsings(SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System")))
              .WithAdditionalAnnotations(Formatter.Annotation).NormalizeWhitespace();
-            return vena.ToFullString();
+            return vena;
         }
+
+        public EmitResult Compile(CompilationUnitSyntax ast, string output, string dotnetcoreRefPath = @"/usr/local/share/dotnet/sdk/NuGetFallbackFolder/microsoft.netcore.app/2.1.1/ref/netcoreapp2.1")
+        {
+            var references = Directory.GetFiles(dotnetcoreRefPath, "*.dll").Select(file => MetadataReference.CreateFromFile(file));
+            var compileOptions = new CSharpCompilationOptions(
+                                        outputKind: OutputKind.ConsoleApplication,
+                                        optimizationLevel: OptimizationLevel.Release,
+                                        platform: Platform.AnyCpu
+                                     );
+            var result = CSharpCompilation.Create(output, new SyntaxTree[] { ast.SyntaxTree }, references, compileOptions).Emit(output + ".dll");
+            if (result.Success)
+            {
+                File.WriteAllText(output + ".runtimeconfig.json", @"
+{
+    ""runtimeOptions"": {
+        ""tfm"": ""netcoreapp2.1"",
+        ""framework"": {
+            ""name"": ""Microsoft.NETCore.App"",
+            ""version"": ""2.1.0""
+        }
+    }
+}");
+            }
+            return result;
+        }
+
+        public 
 
         String Parenthesize(String name, params Expr[] exprs)
         {

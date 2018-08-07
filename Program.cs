@@ -12,9 +12,9 @@ namespace Vena
     {
         static void Main(string[] args)
         {
-             if (args.Length != 2)
+            if (args.Length != 2)
             {
-                Console.WriteLine("Usage: vena [file]");
+                Console.WriteLine("Usage: vena [file] [output]");
             }
             else
             {
@@ -52,7 +52,7 @@ namespace Vena
 
                     Console.WriteLine(new ASTPrinter().Print(stmts));
                 }
-                else if (args[0] == "-gen")
+                else if (args[0] == "-emit")
                 {
                     string input = File.ReadAllText(args[1]);
 
@@ -66,7 +66,32 @@ namespace Vena
                     // Stop if there was a parser error.
                     if (VenaError.HasError) return;
 
-                    Console.WriteLine(new Generator().Emit(stmts));
+                    Console.WriteLine(new Generator().Emit(stmts).ToFullString());
+                }
+                else
+                {
+                    string input = File.ReadAllText(args[0]);
+
+                    Scanner scanner = new Scanner(input);
+                    var tokens = scanner.ScanTokens();
+                    // Stop if there was a syntax error.
+                    if (VenaError.HasError) return;
+
+                    Parser parser = new Parser(tokens);
+                    List<Stmt> stmts = parser.Parse();
+                    // Stop if there was a parser error.
+                    if (VenaError.HasError) return;
+
+                    Generator gen = new Generator();
+                    var ast = gen.Emit(stmts);
+                    var result = gen.Compile(ast, args[1]);
+                    if (!result.Success)
+                    {
+                        foreach (var diag in result.Diagnostics)
+                        {
+                            Console.Error.WriteLine(diag);
+                        }
+                    }
                 }
             }
         }
