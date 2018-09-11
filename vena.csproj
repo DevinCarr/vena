@@ -7,10 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Runner\**" />
     <Compile Remove="Tests\**" />
+    <Compile Remove="UnitTests\**" />
+    <Compile Remove="vena.testrunner\**" />
+    <EmbeddedResource Remove="Runner\**" />
     <EmbeddedResource Remove="Tests\**" />
+    <EmbeddedResource Remove="UnitTests\**" />
+    <EmbeddedResource Remove="vena.testrunner\**" />
+    <None Remove="Runner\**" />
     <None Remove="Tests\**" />
+    <None Remove="UnitTests\**" />
+    <None Remove="vena.testrunner\**" />
     <Compile Remove="AST\Node.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="test.dll.dll" />
+    <None Remove="test.dll.runtimeconfig.json" />
   </ItemGroup>
 
   <ItemGroup>

@@ -84,7 +84,7 @@ namespace Vena
 
                     Generator gen = new Generator();
                     var ast = gen.Emit(stmts);
-                    var result = gen.Compile(ast, args[1]);
+                    var result = gen.Compile(ast, args[1], @"C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.netcore.app\2.1.1\ref\netcoreapp2.1");
                     if (!result.Success)
                     {
                         foreach (var diag in result.Diagnostics)

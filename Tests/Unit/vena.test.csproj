@@ -18,10 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\vena.csproj" />
+    <ProjectReference Include="..\..\vena.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ParserTests\" />
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

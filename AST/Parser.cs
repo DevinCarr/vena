@@ -193,9 +193,23 @@ namespace Vena
 
         Expr Multiplication()
         {
-            Expr expr = Unary();
+            Expr expr = Modulus();
 
             while (Match(SLASH, STAR))
+            {
+                Token op = Previous();
+                Expr right = Modulus();
+                expr = new Binary(expr, op, right);
+            }
+
+            return expr;
+        }
+
+        Expr Modulus()
+        {
+            Expr expr = Unary();
+
+            while (Match(PERCENT))
             {
                 Token op = Previous();
                 Expr right = Unary();
@@ -223,9 +237,14 @@ namespace Vena
             if (Match(TRUE)) return new Literal(true, Expr.VType.Bool);
             if (Match(NIL)) return new Literal(null, Expr.VType.Null);
 
-            if (Match(NUMBER))
+            if (Match(DOUBLE))
             {
                 return new Literal(Previous().Literal, Expr.VType.Double);
+            }
+
+            if (Match(INTEGER))
+            {
+                return new Literal(Previous().Literal, Expr.VType.Int);
             }
 
             if (Match(STRING))

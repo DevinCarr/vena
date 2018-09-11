@@ -261,5 +261,7 @@ __pycache__/
 *.pyc
 
 # Vena
-*.dll
-*.runtimeconfig.json
+Tests/Tmp/
+Tests/*.dll
+Tests/*.runtimeconfig.json
+

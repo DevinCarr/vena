@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "vena": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\..\\..\\Tests\\expression.vena expression"
+    }
+  }
+}

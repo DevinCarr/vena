@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Formatting;
 
+using static Vena.Lexer.TokenType;
+
 namespace Vena.AST
 {
     public class Generator : Expr.IVisitor<ExpressionSyntax>, Stmt.IVisitor<StatementSyntax>
@@ -48,10 +50,11 @@ namespace Vena.AST
             var references = Directory.GetFiles(dotnetcoreRefPath, "*.dll").Select(file => MetadataReference.CreateFromFile(file));
             var compileOptions = new CSharpCompilationOptions(
                                         outputKind: OutputKind.ConsoleApplication,
-                                        optimizationLevel: OptimizationLevel.Release,
+                                        optimizationLevel: OptimizationLevel.Debug,
                                         platform: Platform.AnyCpu
                                      );
-            var result = CSharpCompilation.Create(output, new SyntaxTree[] { ast.SyntaxTree }, references, compileOptions).Emit(output + ".dll");
+            var assemblyName = (output.Contains('/') || output.Contains('\\')) ? Path.GetFileNameWithoutExtension(output) : output;
+            var result = CSharpCompilation.Create(assemblyName, new SyntaxTree[] { ast.SyntaxTree }, references, compileOptions).Emit(output + ".dll");
             if (result.Success)
             {
                 File.WriteAllText(output + ".runtimeconfig.json", @"
@@ -95,7 +98,7 @@ namespace Vena.AST
             return SyntaxFactory.ExpressionStatement(SyntaxFactory.InvocationExpression(
                     SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
                                                          SyntaxFactory.IdentifierName("Console"),
-                                                         SyntaxFactory.IdentifierName("WriteLine"))
+                                                         SyntaxFactory.IdentifierName("Write"))
                                     .WithOperatorToken(SyntaxFactory.Token(SyntaxKind.DotToken))
                 ).WithArgumentList(
                     SyntaxFactory.ArgumentList(
@@ -106,12 +109,33 @@ namespace Vena.AST
 
         public ExpressionSyntax VisitBinaryExpr(Binary expr)
         {
-            throw new NotImplementedException();
+            ExpressionSyntax LeftExpr = expr.Left.Accept(this);
+            ExpressionSyntax RightExpr = expr.Right.Accept(this);
+
+            SyntaxKind op = SyntaxKind.NullKeyword;
+            switch (expr.Op.Type)
+            {
+                // Arithmetic Operators
+                case MINUS: op = SyntaxKind.SubtractExpression; break;
+                case PLUS: op = SyntaxKind.AddExpression; break;
+                case STAR: op = SyntaxKind.MultiplyExpression; break;
+                case SLASH: op = SyntaxKind.DivideExpression; break;
+                case PERCENT: op = SyntaxKind.ModuloExpression; break;
+                // Conditional Operators
+                case EQUAL_EQUAL: op = SyntaxKind.EqualsExpression; break;
+                case BANG_EQUAL: op = SyntaxKind.NotEqualsExpression; break;
+                case LESS: op = SyntaxKind.LessThanExpression; break;
+                case LESS_EQUAL: op = SyntaxKind.LessThanOrEqualExpression; break;
+                case GREATER: op = SyntaxKind.GreaterThanExpression; break;
+                case GREATER_EQUAL: op = SyntaxKind.GreaterThanOrEqualExpression; break;
+            }
+
+            return SyntaxFactory.BinaryExpression(op, LeftExpr, RightExpr);
         }
 
         public ExpressionSyntax VisitGroupingExpr(Grouping expr)
         {
-            throw new NotImplementedException();
+            return SyntaxFactory.ParenthesizedExpression(expr.Expr.Accept(this));
         }
 
         public ExpressionSyntax VisitLiteralExpr(Literal expr)
@@ -153,7 +177,18 @@ namespace Vena.AST
 
         public ExpressionSyntax VisitUnaryExpr(Unary expr)
         {
-            throw new NotImplementedException();
+            ExpressionSyntax RightExpr = expr.Right.Accept(this);
+
+            switch (expr.Op.Type)
+            {
+                case MINUS: 
+                    return SyntaxFactory.PrefixUnaryExpression(SyntaxKind.UnaryMinusExpression, RightExpr);
+                case BANG:
+                    return SyntaxFactory.PrefixUnaryExpression(SyntaxKind.ExclamationToken, RightExpr);
+            }
+
+            // Invalid Unary operator
+            return null;
         }
     }
 }

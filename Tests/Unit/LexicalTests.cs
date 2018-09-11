@@ -99,17 +99,32 @@ namespace Vena.Test
         }
 
         [Theory]
+        [InlineData(1, "1")]
+        [InlineData(2, "2")]
+        [InlineData(1234567890, "1234567890")]
+        public void NumberTest(long expected, string input)
+        {
+            var scanner = new Scanner(input);
+            var tokens = scanner.ScanTokens();
+            // Remove the EOF token
+            var token = tokens.Where(t => t.Type != EOF).First();
+            long? actual = token.Literal as long?;
+            Assert.Equal(INTEGER, token.Type);
+            Assert.Equal(expected, actual.Value);
+        }
+
+        [Theory]
         [InlineData(1.2, "1.2")]
         [InlineData(1.0, "1.0")]
-        [InlineData(1234567890.1234567890,"1234567890.1234567890")]
-        public void NumberTest(double expected, string input)
+        [InlineData(1234567890.1234567890, "1234567890.1234567890")]
+        public void DoubleTest(double expected, string input)
         {
             var scanner = new Scanner(input);
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
             var token = tokens.Where(t => t.Type != EOF).First();
             double? actual = token.Literal as double?;
-            Assert.Equal(NUMBER, token.Type);
+            Assert.Equal(DOUBLE, token.Type);
             Assert.Equal(expected, actual.Value);
         }
 

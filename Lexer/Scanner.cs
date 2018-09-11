@@ -9,7 +9,8 @@ namespace Vena.Lexer
     {
         // Single-character tokens.
         LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-        COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+        COMMA, DOT, MINUS, PERCENT, PLUS, SEMICOLON, SLASH,
+        STAR,
 
         // One or two character tokens.
         BANG, BANG_EQUAL,
@@ -18,7 +19,7 @@ namespace Vena.Lexer
         LESS, LESS_EQUAL,
 
         // Literals.
-        IDENTIFIER, STRING, NUMBER,
+        IDENTIFIER, STRING, INTEGER, DOUBLE,
 
         // Keywords.
         AND, CLASS, ELSE, FALSE, FUN, FOR, IF, LET, NIL,
@@ -161,6 +162,7 @@ namespace Vena.Lexer
         private void Number()
         {
             while (IsDigit(Peek())) Advance();
+            TokenType type = TokenType.INTEGER;
 
             // Look for a fractional part.
             if (Peek() == '.' && IsDigit(PeekNext()))
@@ -169,10 +171,19 @@ namespace Vena.Lexer
                 Advance();
 
                 while (IsDigit(Peek())) Advance();
+                type = TokenType.DOUBLE;
             }
 
-            AddToken(TokenType.NUMBER,
-                 double.Parse(source.Substring(start, current - start)));
+            if (type == TokenType.INTEGER)
+            {
+                AddToken(TokenType.INTEGER,
+                     long.Parse(source.Substring(start, current - start)));
+            }
+            else
+            {
+                AddToken(TokenType.DOUBLE,
+                     double.Parse(source.Substring(start, current - start)));
+            }
         }
 
         private void Identifier()
@@ -202,6 +213,7 @@ namespace Vena.Lexer
                 case '+': AddToken(TokenType.PLUS); break;
                 case ';': AddToken(TokenType.SEMICOLON); break;
                 case '*': AddToken(TokenType.STAR); break;
+                case '%': AddToken(TokenType.PERCENT); break;
                 case '!': AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG); break;
                 case '=': AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL); break;
                 case '<': AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS); break;
