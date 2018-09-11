@@ -27,8 +27,8 @@ steps:
     projects: ./Tests/Unit/vena.test.csproj
     arguments: '--configuration $(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Test Runner'
-  inputs:
-    command: run
-    arguments: '--project ./Runner/vena.testrunner.csproj $(Build.Repository.LocalPath)'
+#- task: DotNetCoreCLI@2
+#  displayName: 'Test Runner'
+#  inputs:
+#    command: run
+#    arguments: '--project ./Runner/vena.testrunner.csproj $(Build.Repository.LocalPath)'
