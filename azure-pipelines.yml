@@ -31,4 +31,4 @@ steps:
   displayName: 'Test Runner'
   inputs:
     command: run
-    projects: --project ./Runner/vena.testrunner.csproj
+    arguments: '--project ./Runner/vena.testrunner.csproj'
