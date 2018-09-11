@@ -24,11 +24,11 @@ steps:
   displayName: Test
   inputs:
     command: test
-    projects: ./Tests/Unit/*.csproj
+    projects: ./Tests/Unit/vena.test.csproj
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Test Runner'
   inputs:
     command: run
-    projects: ./Runner/vena.testrunner.csproj
+    projects: --project ./Runner/vena.testrunner.csproj
