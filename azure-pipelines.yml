@@ -14,12 +14,10 @@ steps:
   displayName: Restore
   inputs:
     command: restore
-    projects: **/*.csproj
 
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
-    projects: **/*.csproj
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
@@ -34,4 +32,3 @@ steps:
   inputs:
     command: run
     projects: ./Runner/vena.testrunner.csproj
-
