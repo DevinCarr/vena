@@ -16,9 +16,9 @@ namespace vena.testrunner
                 return 0;
             }
             var workingDirectory = args.Length > 0 ? args[0] : @"D:\github\vena\";
-            var testsPath = Path.Combine(workingDirectory, @"Tests\");
-            var buildtests = Path.Combine(workingDirectory, @"Tests\Tmp\");
-            var venaPath = @".\bin\Debug\netcoreapp2.1\vena.dll";
+            var testsPath = Path.Combine(workingDirectory, @"Tests/");
+            var buildtests = Path.Combine(workingDirectory, @"Tests/Tmp/");
+            var venaPath = @"./bin/Debug/netcoreapp2.1/vena.dll";
 
             // Create buildtests location if not exist
             if (!Directory.Exists(buildtests))
@@ -54,7 +54,7 @@ namespace vena.testrunner
             return 0;
         }
 
-        private static void CleanTests(string directory = @"Tests\Tmp\")
+        private static void CleanTests(string directory = @"Tests/Tmp/")
         {
             foreach (var file in Directory.EnumerateFiles(directory))
             {
@@ -64,7 +64,7 @@ namespace vena.testrunner
 
         private static (bool, string) BuildTest(string working, string venadll, string inputFile)
         {
-            var output = $".\\Tests\\Tmp\\{Path.GetFileNameWithoutExtension(inputFile)}";
+            var output = $"./Tests/Tmp/{Path.GetFileNameWithoutExtension(inputFile)}";
 
             var process = new Process()
             {
@@ -92,7 +92,7 @@ namespace vena.testrunner
 
         private static (bool, string) RunTest(string working, string testdll)
         {
-            var expected = Path.Combine(working, $".\\Tests\\{Path.GetFileNameWithoutExtension(testdll)}.vena.out");
+            var expected = Path.Combine(working, $"./Tests/{Path.GetFileNameWithoutExtension(testdll)}.vena.out");
             var expectedOutput = File.ReadAllText(expected);
 
             var process = new Process()

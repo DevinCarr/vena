@@ -49,6 +49,16 @@ namespace Vena.AST
             return Parenthesize("print", stmt.Expr);
         }
 
+        public string VisitVarStmt(Var stmt)
+        {
+            return Parenthesize("var", stmt.Initializer);
+        }
+
+        public string VisitAssignStmt(Assign stmt)
+        {
+            return Parenthesize("assign", stmt.Expr);
+        }
+
         public string VisitBinaryExpr(Binary expr)
         {
             return Parenthesize(expr.Op.Lexeme, expr.Left, expr.Right);
@@ -68,6 +78,11 @@ namespace Vena.AST
         public string VisitUnaryExpr(Unary expr)
         {
             return Parenthesize(expr.Op.Lexeme, expr.Right);
+        }
+
+        public string VisitVariableExpr(Variable expr)
+        {
+            return expr.Name.Lexeme;
         }
     }
 }

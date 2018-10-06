@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{879EF380
 	ProjectSection(SolutionItems) = preProject
 		Tests\expression.vena = Tests\expression.vena
 		Tests\expression.vena.out = Tests\expression.vena.out
+		Tests\variables.vena = Tests\variables.vena
+		Tests\variables.vena.out = Tests\variables.vena.out
 	EndProjectSection
 EndProject
 Global

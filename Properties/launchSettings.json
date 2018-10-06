@@ -2,7 +2,7 @@
   "profiles": {
     "vena": {
       "commandName": "Project",
-      "commandLineArgs": "..\\..\\..\\Tests\\expression.vena expression"
+      "commandLineArgs": "-emit ..\\..\\..\\Tests\\variables.vena"
     }
   }
 }

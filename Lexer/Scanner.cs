@@ -19,11 +19,13 @@ namespace Vena.Lexer
         LESS, LESS_EQUAL,
 
         // Literals.
-        IDENTIFIER, STRING, INTEGER, DOUBLE,
+        IDENTIFIER, VAR, STRING, INTEGER, DOUBLE,
 
         // Keywords.
         AND, CLASS, ELSE, FALSE, FUN, FOR, IF, LET, NIL,
         OR, PRINT, RETURN, SUPER, THIS, TRUE, WHILE,
+        // Type Keywords.
+        INTEGER_KEYWORD, DOUBLE_KEYWORD, STRING_KEYWORD, BOOL_KEYWORD,
 
         EOF
     };
@@ -39,22 +41,26 @@ namespace Vena.Lexer
 
         private static Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
         {
-            { "and", TokenType.AND },
-            { "class", TokenType.CLASS },
-            { "else", TokenType.ELSE },
-            { "false", TokenType.FALSE },
-            { "for", TokenType.FOR },
-            { "fun", TokenType.FUN },
-            { "if", TokenType.IF },
-            { "let", TokenType.LET },
-            { "nil", TokenType.NIL },
-            { "or", TokenType.OR },
-            { "print", TokenType.PRINT },
-            { "return", TokenType.RETURN },
-            { "super", TokenType.SUPER },
-            { "this", TokenType.THIS },
-            { "true", TokenType.TRUE },
-            { "while", TokenType.WHILE },
+            { "and",        TokenType.AND },
+            { "bool",       TokenType.BOOL_KEYWORD },
+            { "class",      TokenType.CLASS },
+            { "double",     TokenType.DOUBLE_KEYWORD },
+            { "else",       TokenType.ELSE },
+            { "false",      TokenType.FALSE },
+            { "for",        TokenType.FOR },
+            { "fun",        TokenType.FUN },
+            { "if",         TokenType.IF },
+            { "int",        TokenType.INTEGER_KEYWORD },
+            { "let",        TokenType.LET },
+            { "nil",        TokenType.NIL },
+            { "or",         TokenType.OR },
+            { "print",      TokenType.PRINT },
+            { "return",     TokenType.RETURN },
+            { "string",     TokenType.STRING_KEYWORD },
+            { "super",      TokenType.SUPER },
+            { "this",       TokenType.THIS },
+            { "true",       TokenType.TRUE },
+            { "while",      TokenType.WHILE },
         };
 
         public Scanner(string source)

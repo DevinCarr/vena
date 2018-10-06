@@ -27,5 +27,18 @@ namespace Vena
             }
             HasError = true;
         }
+
+        public static void CompileError(Token token, string message)
+        {
+            if (token.Type == TokenType.EOF)
+            {
+                Console.Error.WriteLine($"[line {token.Line} at end] Compile Error: {message}");
+            }
+            else
+            {
+                Console.Error.WriteLine($"[line {token.Line} at '{token.Lexeme}'] Compile Error: {message}");
+            }
+            HasError = true;
+        }
     }
 }

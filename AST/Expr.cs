@@ -13,18 +13,10 @@ namespace Vena.AST
             R VisitGroupingExpr(Grouping expr);
             R VisitLiteralExpr(Literal expr);
             R VisitUnaryExpr(Unary expr);
+            R VisitVariableExpr(Variable expr);
         }
 
         public abstract R Accept<R>(IVisitor<R> visitor);
-
-        public enum VType
-        {
-            Null,
-            Int,
-            Double,
-            String,
-            Bool
-        };
     }
 
     public class Binary : Expr
@@ -98,6 +90,21 @@ namespace Vena.AST
         public override R Accept<R>(IVisitor<R> visitor)
         {
             return visitor.VisitUnaryExpr(this);
+        }
+    }
+
+    public class Variable : Expr
+    {
+        public readonly Token Name;
+
+        public Variable(Token name)
+        {
+            this.Name = name;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitVariableExpr(this);
         }
     }
 }

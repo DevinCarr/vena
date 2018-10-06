@@ -15,6 +15,8 @@ namespace Vena.AST
 {
     public class Generator : Expr.IVisitor<ExpressionSyntax>, Stmt.IVisitor<StatementSyntax>
     {
+        class GeneratorError : SystemException { }
+
         public Generator()
         {
         }
@@ -107,6 +109,54 @@ namespace Vena.AST
             ));
         }
 
+        public StatementSyntax VisitVarStmt(Var stmt)
+        {
+            ExpressionSyntax value = null;
+            if (stmt.Initializer != null)
+            {
+                value = stmt.Initializer.Accept(this);
+            }
+            SyntaxKind type = SyntaxKind.VoidKeyword;
+            switch (stmt.Type)
+            {
+                case VType.Null: break;
+                case VType.Int:
+                    type = SyntaxKind.LongKeyword;
+                    break;
+                case VType.Double:
+                    type = SyntaxKind.DoubleKeyword;
+                    break;
+                case VType.String:
+                    type = SyntaxKind.StringKeyword;
+                    break;
+                case VType.Bool:
+                    type = SyntaxKind.BoolKeyword;
+                    break;
+            }
+            TypeSyntax typeSyntax = SyntaxFactory.PredefinedType(SyntaxFactory.Token(type));
+            var vars = SyntaxFactory.SeparatedList<VariableDeclaratorSyntax>();
+            vars = vars.Add(
+                SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(stmt.Name.Lexeme), null, SyntaxFactory.EqualsValueClause(value))
+            );
+            var localDecl = SyntaxFactory.LocalDeclarationStatement(SyntaxFactory.VariableDeclaration(typeSyntax, vars));
+            // TODO(@devincarr): Line Trivia to map c# errors into vena code.
+            //var lineTrivia = SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(SyntaxFactory.Literal(20), SyntaxFactory.Literal("test.vena"), true));
+            //return localDecl.WithLeadingTrivia(SyntaxFactory.TriviaList(lineTrivia));
+            return localDecl;
+        }
+
+        public StatementSyntax VisitAssignStmt(Assign stmt)
+        {
+            var value = stmt.Expr.Accept(this);
+            var assign = SyntaxFactory.AssignmentExpression(
+                SyntaxKind.SimpleAssignmentExpression,
+                SyntaxFactory.IdentifierName(stmt.Name.Lexeme),
+                value
+            );
+            //if (!environment.Define(stmt.Name, stmt.Expr.)) throw new GeneratorError();
+            return SyntaxFactory.ExpressionStatement(assign);
+        }
+
         public ExpressionSyntax VisitBinaryExpr(Binary expr)
         {
             ExpressionSyntax LeftExpr = expr.Left.Accept(this);
@@ -145,20 +195,20 @@ namespace Vena.AST
             SyntaxToken value = SyntaxFactory.Token(SyntaxKind.NullKeyword);
             switch (expr.Type)
             {
-                case Expr.VType.Null: break;
-                case Expr.VType.Int:
+                case VType.Null: break;
+                case VType.Int:
                     kind = SyntaxKind.NumericLiteralExpression;
                     value = SyntaxFactory.Literal(expr.GetIntValue().Value);
                     break;
-                case Expr.VType.Double:
+                case VType.Double:
                     kind = SyntaxKind.NumericLiteralExpression;
                     value = SyntaxFactory.Literal(expr.GetDoubleValue().Value);
                     break;
-                case Expr.VType.String:
+                case VType.String:
                     kind = SyntaxKind.StringLiteralExpression;
                     value = SyntaxFactory.Literal(expr.GetStringValue());
                     break;
-                case Expr.VType.Bool:
+                case VType.Bool:
                     var v = expr.GetBoolValue().Value;
                     if (v)
                     {
@@ -189,6 +239,11 @@ namespace Vena.AST
 
             // Invalid Unary operator
             return null;
+        }
+
+        public ExpressionSyntax VisitVariableExpr(Variable expr)
+        {
+            return SyntaxFactory.IdentifierName(expr.Name.Lexeme);
         }
     }
 }
