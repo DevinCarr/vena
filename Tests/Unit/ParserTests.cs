@@ -18,7 +18,7 @@ namespace Vena.Test
                     "[Stmt (+ (group (group (group (group (+ 1 2))))) 1)]")]
         public void ExpressionTest(string input, string expected)
         {
-            Scanner scanner = new Scanner(input);
+            Scanner scanner = new Scanner(input, "file.vena");
             var tokens = scanner.ScanTokens();
             Parser parser = new Parser(tokens);
             List<Stmt> stmts = parser.Parse();
@@ -32,7 +32,7 @@ namespace Vena.Test
                     "[Stmt 1][Stmt 2]")]
         public void StatementTest(string input, string expected)
         {
-            Scanner scanner = new Scanner(input);
+            Scanner scanner = new Scanner(input, "file.vena");
             var tokens = scanner.ScanTokens();
             Parser parser = new Parser(tokens);
             List<Stmt> stmts = parser.Parse();

@@ -13,7 +13,7 @@ namespace Vena.Test
         //[InlineData("()", 3, new TokenType[] { LEFT_PAREN, RIGHT_PAREN, EOF })]
         //public void LexicalTest1(string input, int len, TokenType[] expected)
         //{
-        //    var scanner = new Scanner(input);
+        //    var scanner = new Scanner(input, "test.vena");
         //    var tokens = scanner.ScanTokens();
         //    Assert.Equal(len, tokens.Count);
         //    var pairs = expected.Zip(tokens, (e, a) => (e, a.Type));
@@ -49,7 +49,7 @@ namespace Vena.Test
                 GREATER_EQUAL,
                 EOF
             };
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             var len = expected.Length;
             Assert.Equal(len, tokens.Count);
@@ -64,7 +64,7 @@ namespace Vena.Test
         public void InvalidCharacterTest()
         {
             var input = "&";
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             Assert.True(VenaError.HasError);
         }
@@ -76,7 +76,7 @@ namespace Vena.Test
         [InlineData(1, ">//asd")]
         public void CommentTest(int tokenCount, string input)
         {
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
             int lexedCount = tokens.Where(t => t.Type != EOF).Count();
@@ -89,7 +89,7 @@ namespace Vena.Test
         [InlineData("aba \rsdb as\ndb as//d", "\"aba \rsdb as\ndb as//d\"")]
         public void StringTest(string expected, string input)
         {
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
             var token = tokens.Where(t => t.Type != EOF).First();
@@ -104,7 +104,7 @@ namespace Vena.Test
         [InlineData(1234567890, "1234567890")]
         public void NumberTest(long expected, string input)
         {
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
             var token = tokens.Where(t => t.Type != EOF).First();
@@ -119,7 +119,7 @@ namespace Vena.Test
         [InlineData(1234567890.1234567890, "1234567890.1234567890")]
         public void DoubleTest(double expected, string input)
         {
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
             var token = tokens.Where(t => t.Type != EOF).First();
@@ -134,7 +134,7 @@ namespace Vena.Test
         [InlineData("verylongidentifierpleasebeokaywiththis_")]
         public void IdentifierTest(string input)
         {
-            var scanner = new Scanner(input);
+            var scanner = new Scanner(input, "test.vena");
             var tokens = scanner.ScanTokens();
             // Remove the EOF token
             var token = tokens.Where(t => t.Type != EOF).First();
