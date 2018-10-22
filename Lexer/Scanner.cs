@@ -9,8 +9,8 @@ namespace Vena.Lexer
     {
         // Single-character tokens.
         LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-        COMMA, DOT, MINUS, PERCENT, PLUS, SEMICOLON, SLASH,
-        STAR,
+        COMMA, DOT, MINUS, NEW_LINE, PERCENT, PLUS, SEMICOLON,
+        SLASH, STAR, 
 
         // One or two character tokens.
         BANG, BANG_EQUAL,
@@ -33,10 +33,12 @@ namespace Vena.Lexer
     public class Scanner
     {
         private readonly string source;
+        private readonly string file;
         private List<Token> tokens;
         private readonly int end;
         private int start = 0;
         private int current = 0;
+        private int column = 0;
         private int line = 1;
 
         private static Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
@@ -63,9 +65,10 @@ namespace Vena.Lexer
             { "while",      TokenType.WHILE },
         };
 
-        public Scanner(string source)
+        public Scanner(string source, string file)
         {
             this.source = source;
+            this.file = file;
             this.end = source.Length;
             this.tokens = new List<Token>();
         }
@@ -78,7 +81,7 @@ namespace Vena.Lexer
                 ScanToken();
             }
 
-            tokens.Add(new Token(TokenType.EOF, "", null, line));
+            tokens.Add(new Token(TokenType.EOF, "", null, file, line));
             return ref tokens;
         }
 
@@ -90,6 +93,7 @@ namespace Vena.Lexer
         private char Advance()
         {
             current++;
+            column++;
             return source.ElementAt(current - 1);
         }
 
@@ -101,7 +105,7 @@ namespace Vena.Lexer
         private void AddToken(TokenType type, Object literal)
         {
             string text = source.Substring(start, current - start);
-            tokens.Add(new Token(type, text, literal, line));
+            tokens.Add(new Token(type, text, literal, file, line));
         }
 
         private bool Match(char expected)
@@ -110,6 +114,7 @@ namespace Vena.Lexer
             if (source.ElementAt(current) != expected) return false;
 
             current++;
+            column++;
             return true;
         }
 
@@ -240,10 +245,11 @@ namespace Vena.Lexer
                 case ' ':
                 case '\r':
                 case '\t':
-                    
                     break;
                 case '\n':
+                    if (column == 2) AddToken(TokenType.NEW_LINE);
                     line++;
+                    column = 0;
                     break;
                 // Strings
                 case '"': LexString(); break;

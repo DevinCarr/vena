@@ -13,6 +13,7 @@ namespace Vena.AST
             R VisitPrintStmt(Print stmt);
             R VisitVarStmt(Var stmt);
             R VisitAssignStmt(Assign stmt);
+            R VisitNewLineStmt(NewLine stmt);
         }
 
         public abstract R Accept<R>(IVisitor<R> visitor);
@@ -77,6 +78,20 @@ namespace Vena.AST
         public override R Accept<R>(IVisitor<R> visitor)
         {
             return visitor.VisitAssignStmt(this);
+        }
+    }
+
+    public class NewLine : Stmt
+    {
+        public readonly Token Token;
+        public NewLine(Token token)
+        {
+            this.Token = token;
+        }
+
+        public override R Accept<R>(IVisitor<R> visitor)
+        {
+            return visitor.VisitNewLineStmt(this);
         }
     }
 }

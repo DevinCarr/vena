@@ -21,7 +21,7 @@ namespace Vena
                 if (args[0] == "-lex")
                 {
                     string input = File.ReadAllText(args[1]);
-                    Scanner scanner = new Scanner(input);
+                    Scanner scanner = new Scanner(input, args[1]);
                     var tokens = scanner.ScanTokens();
                     int line = 1;
                     int iterator = 0;
@@ -42,7 +42,7 @@ namespace Vena
                 else if (args[0] == "-parse")
                 {
                     string input = File.ReadAllText(args[1]);
-                    Scanner scanner = new Scanner(input);
+                    Scanner scanner = new Scanner(input, args[1]);
                     var tokens = scanner.ScanTokens();
                     Parser parser = new Parser(tokens);
                     List<Stmt> stmts = parser.Parse();
@@ -56,7 +56,7 @@ namespace Vena
                 {
                     string input = File.ReadAllText(args[1]);
 
-                    Scanner scanner = new Scanner(input);
+                    Scanner scanner = new Scanner(input, args[1]);
                     var tokens = scanner.ScanTokens();
                     // Stop if there was a syntax error.
                     if (VenaError.HasError) return;
@@ -72,7 +72,7 @@ namespace Vena
                 {
                     string input = File.ReadAllText(args[0]);
 
-                    Scanner scanner = new Scanner(input);
+                    Scanner scanner = new Scanner(input, args[0]);
                     var tokens = scanner.ScanTokens();
                     // Stop if there was a syntax error.
                     if (VenaError.HasError) return;

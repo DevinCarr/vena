@@ -195,6 +195,7 @@ namespace Vena.AST
         Stmt Statement()
         {
             if (Match(PRINT)) return PrintStatement();
+            if (Check(NEW_LINE)) return NewLineStatement();
 
             return ExpressionStatement();
         }
@@ -204,6 +205,12 @@ namespace Vena.AST
             Expr value = Expression();
             Consume(SEMICOLON, "Expect ';' after value.");
             return new Print(value);
+        }
+
+        Stmt NewLineStatement()
+        {
+            Token token = Consume(NEW_LINE, "Expect '\n'.");
+            return new NewLine(token);
         }
 
         Stmt ExpressionStatement()

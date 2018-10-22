@@ -8,18 +8,30 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Formatting;
-
+using Vena.Lexer;
 using static Vena.Lexer.TokenType;
 
 namespace Vena.AST
 {
+    public static class GeneratorExtensions {
+        public static CSharpSyntaxNode AddLineTrivia(this CSharpSyntaxNode node, Token token)
+        {
+            //TODO(@devincarr): Still have issues with leading spaces marking offset areas in the line directives.
+            //TODO(@devincarr): Only add line directives before scope blocks to reduce the extra trivia in the emitted code.
+            if (node.GetLeadingTrivia().Where(t => t.IsKind(SyntaxKind.LineDirectiveTrivia)).Count() == 0)
+                return node.WithLeadingTrivia(SyntaxFactory.TriviaList(
+                    SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(
+                        SyntaxFactory.Literal(token.Line),
+                        SyntaxFactory.Literal(token.File), true
+                    ))
+                ));
+            else return node;
+        }
+    }
+
     public class Generator : Expr.IVisitor<ExpressionSyntax>, Stmt.IVisitor<StatementSyntax>
     {
         class GeneratorError : SystemException { }
-
-        public Generator()
-        {
-        }
 
         public CompilationUnitSyntax Emit(List<Stmt> stmts)
         {
@@ -73,23 +85,6 @@ namespace Vena.AST
             return result;
         }
 
-        public 
-
-        String Parenthesize(String name, params Expr[] exprs)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            builder.Append("(").Append(name);
-            foreach (Expr expr in exprs)
-            {
-                builder.Append(" ");
-                builder.Append(expr.Accept(this));
-            }
-            builder.Append(")");
-
-            return builder.ToString();
-        }
-
         public StatementSyntax VisitExpressionStmt(Expression stmt)
         {
             return SyntaxFactory.ExpressionStatement(stmt.Expr.Accept(this));
@@ -107,6 +102,13 @@ namespace Vena.AST
                     SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(stmt.Expr.Accept(this))
                     )).WithOpenParenToken(SyntaxFactory.Token(SyntaxKind.OpenParenToken)).WithCloseParenToken(SyntaxFactory.Token(SyntaxKind.CloseParenToken))
             ));
+        }
+
+        public StatementSyntax VisitNewLineStmt(NewLine stmt)
+        {
+            // This is good enough for now since I haven't found a way to 
+            // add an empty new line without adding trivia to the previous/next node.
+            return SyntaxFactory.EmptyStatement();
         }
 
         public StatementSyntax VisitVarStmt(Var stmt)
@@ -139,9 +141,6 @@ namespace Vena.AST
                 SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(stmt.Name.Lexeme), null, SyntaxFactory.EqualsValueClause(value))
             );
             var localDecl = SyntaxFactory.LocalDeclarationStatement(SyntaxFactory.VariableDeclaration(typeSyntax, vars));
-            // TODO(@devincarr): Line Trivia to map c# errors into vena code.
-            //var lineTrivia = SyntaxFactory.Trivia(SyntaxFactory.LineDirectiveTrivia(SyntaxFactory.Literal(20), SyntaxFactory.Literal("test.vena"), true));
-            //return localDecl.WithLeadingTrivia(SyntaxFactory.TriviaList(lineTrivia));
             return localDecl;
         }
 
@@ -153,8 +152,7 @@ namespace Vena.AST
                 SyntaxFactory.IdentifierName(stmt.Name.Lexeme),
                 value
             );
-            //if (!environment.Define(stmt.Name, stmt.Expr.)) throw new GeneratorError();
-            return SyntaxFactory.ExpressionStatement(assign);
+            return (StatementSyntax)SyntaxFactory.ExpressionStatement(assign).AddLineTrivia(stmt.Name);
         }
 
         public ExpressionSyntax VisitBinaryExpr(Binary expr)

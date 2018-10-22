@@ -84,5 +84,10 @@ namespace Vena.AST
         {
             return expr.Name.Lexeme;
         }
+
+        public string VisitNewLineStmt(NewLine stmt)
+        {
+            return "\n";
+        }
     }
 }
